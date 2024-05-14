@@ -1,21 +1,16 @@
 package org.durak.model;
 
 public class User {
-    private int id;
     private String login;
     private String name;
     private int score;
 
-    public User(int id, String login, String name, int score){
-        this.id= id;
-        this.login = login;
+    public User(String name, String login, int score){
         this.name = name;
+        this.login = login;
         this.score = score;
     }
 
-    public int getId() {
-        return id;
-    }
 
     public String getLogin() {
         return login;
@@ -27,10 +22,6 @@ public class User {
 
     public int getScore() {
         return score;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setLogin(String login) {
