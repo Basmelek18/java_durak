@@ -1,0 +1,40 @@
+# Игнорирование временных файлов
+*/target/
+*/.idea/
+*/.mvn/
+*/.DS_Store
+*/target/
+*/.settings/
+
+# Игнорирование сгенерированных файлов Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/
+
+# Игнорирование логов и файлов IDE
+*.log
+*.log.*
+*.iml
+.idea/
+.idea_modules/
+.classpath
+.project
+.settings/
+.vscode/
+
+# Игнорирование файлов настроек
+spring-boot-devtools.properties
+
+# Игнорирование файлов настроек, которые могут содержать локальные пути
+*.properties
+
+#env
+.env*
+.env
+
