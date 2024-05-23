@@ -1,6 +1,11 @@
 package org.durak.model;
 
-public class Card {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Card implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final int rank;
     private final int suit;
 

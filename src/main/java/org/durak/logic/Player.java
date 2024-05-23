@@ -15,7 +15,9 @@ public class Player {
     }
 
     public Card move(int cardIndexInHand) {
-        return hand.get(cardIndexInHand);
+        Card card = hand.get(cardIndexInHand);
+        hand.remove(cardIndexInHand);
+        return card;
     }
 
     public void draw(List<Card> cards) {

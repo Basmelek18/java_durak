@@ -17,12 +17,18 @@ public class SecondClient {
                 BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))
         ) {
             String userInput;
+            String myLogin = "";
+            String serverAnswer;
             while ((userInput = stdIn.readLine()) != null) {
-                out.println(userInput); // Отправка данных на сервер
-                String serverAnswer = in.readLine();
+                if (!myLogin.equals("")) {
+                    out.println(myLogin + ":" + userInput); // Отправка данных на сервер
+                } else {
+                    out.println(userInput); // Отправка данных на сервер
+                }
+                serverAnswer = in.readLine();
                 System.out.println("От сервера: " + serverAnswer); // Вывод ответа от сервера
                 if (serverAnswer.startsWith("You are ")) {
-                    String myLogin = serverAnswer;
+                    myLogin = serverAnswer;
                     int lastIndex = myLogin.lastIndexOf(" "); // Находим индекс последнего пробела
                     myLogin = myLogin.substring(lastIndex + 1);
                     System.out.println("My login " + myLogin);
