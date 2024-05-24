@@ -5,7 +5,7 @@ import org.durak.controller.dto.CreateGameResponse;
 
 import java.util.Random;
 
-public class CreateController {
+public class CreateGameController {
     private Random random = new Random();
 
     public CreateGameResponse startGame(CreateGameRequest request) {

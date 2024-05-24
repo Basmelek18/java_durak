@@ -7,11 +7,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.durak.controller.dto.LoginRequest;
-import org.durak.logic.GameLogic;
+import org.durak.controller.dto.*;
 import org.durak.model.Card;
 import org.durak.repository.GetCards;
 
@@ -20,6 +21,13 @@ public class Server {
     private static List<ClientHandler> clients = new ArrayList<>();
     private static List<Card> cards = new ArrayList<>();
     private LoginController loginController = new LoginController();
+    private RegistrationController registrationController = new RegistrationController();
+    private CreateGameController createGameController = new CreateGameController();
+    private JoinGameController joinGameController = new JoinGameController();
+    private CardsController cardsController = new CardsController();
+    private TakeCardsFromListController takeCardsFromListController = new TakeCardsFromListController();
+    private Map<Long, List<Long>> allGamesWithPlayers = new HashMap<>();
+    private Map<Long, List<Card>> cardsInDeckMap = new HashMap<>();
 
     public Server() throws SQLException {
         cards = GetCards.getCards();
@@ -37,10 +45,23 @@ public class Server {
                 Object response = null;
                 if (clientRequest instanceof LoginRequest) {
                     response = loginController.login((LoginRequest) clientRequest);
+                } else if (clientRequest instanceof RegistrationRequest) {
+                    response = registrationController.registration((RegistrationRequest) clientRequest);
+                } else if (clientRequest instanceof CreateGameController) {
+                    response = createGameController.startGame((CreateGameRequest) clientRequest);
+                    CreateGameResponse response1 = (CreateGameResponse) response;
+                    allGamesWithPlayers.put(response1.getGameId(), new ArrayList<>());
+                    cardsInDeckMap.put(response1.getGameId(), GetCards.getCards());
+                } else if (clientRequest instanceof JoinGameRequest) {
+                    response = joinGameController.joinGame((JoinGameRequest) clientRequest, allGamesWithPlayers);
+                } else if (clientRequest instanceof CardsController) {
+                    response = cardsController.getCards((CardsRequest) clientRequest, cardsInDeckMap);
+                } else if (clientRequest instanceof TakeCardsFromListRequest) {
+                    response = takeCardsFromListController.takeCardsFromList((TakeCardsFromListRequest) clientRequest, cardsInDeckMap);
                 }
                 ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 outputStream.writeObject(response);
-
+                serverSocket.close();
             }
         } catch (IOException e) {
             System.err.println("Error in server: " + e.getMessage());

@@ -9,8 +9,12 @@ import java.util.Map;
 
 public class CardsController {
     public CardsResponse getCards(CardsRequest request, Map<Long, List<Card>> cards) {
-        Card trump = cards.get(request.getGameId()).get(35);
-        int amount = cards.get(request.getGameId()).size();
+        List<Card> allCards = cards.get(request.getGameId());
+        int amount = allCards.size();
+        Card trump = null;
+        if (amount>0) {
+            trump = allCards.get(amount - 1);
+        }
         return new CardsResponse(trump, amount);
     }
 }

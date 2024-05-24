@@ -23,6 +23,8 @@ public class Client {
 
             if (userInput.equals("l")) {
                 RequestLogic.login(socket);
+            } else if (userInput.equals("r")) {
+                RequestLogic.registration(socket);
             }
         }
     }
