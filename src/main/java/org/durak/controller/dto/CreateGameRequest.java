@@ -6,13 +6,13 @@ import java.io.Serializable;
 public class CreateGameRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private int idPlayer;
+    private long idPlayer;
 
-    public CreateGameRequest(int idPlayer) {
+    public CreateGameRequest(long idPlayer) {
         this.idPlayer = idPlayer;
     }
 
-    public int getIdPlayer() {
+    public long getIdPlayer() {
         return idPlayer;
     }
 

@@ -2,7 +2,12 @@ package org.durak.controller.dto;
 
 import org.durak.model.Card;
 
-public class CardsResponse {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class CardsResponse implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Card trump;
     private int amount;
 

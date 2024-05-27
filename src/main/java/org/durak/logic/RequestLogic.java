@@ -1,16 +1,15 @@
 package org.durak.logic;
 
-import org.durak.controller.dto.LoginRequest;
-import org.durak.controller.dto.LoginResponse;
-import org.durak.controller.dto.RegistrationRequest;
-import org.durak.controller.dto.RegistrationResponse;
+import org.durak.controller.dto.*;
+import org.durak.model.Card;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class RequestLogic {
 
-    public static Object login(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+    public static Object login(ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Your login");
         BufferedReader valIn = new BufferedReader(new InputStreamReader(System.in));
         String value = valIn.readLine();
@@ -27,7 +26,7 @@ public class RequestLogic {
         return response;
     }
 
-    public static void registration(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+    public static void registration(ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Your login");
         BufferedReader valIn1 = new BufferedReader(new InputStreamReader(System.in));
         String value1 = valIn1.readLine();
@@ -40,7 +39,61 @@ public class RequestLogic {
         Object response = inputStream.readObject();
 
         if (response instanceof RegistrationResponse) {
-            System.out.println("Login successfully registered");
+            System.out.println("User successfully registered");
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+    }
+
+    public static void createGame(ObjectOutputStream outputStream, ObjectInputStream inputStream, long userId) throws IOException, ClassNotFoundException {
+        CreateGameRequest createGameRequest = new CreateGameRequest(userId);
+        outputStream.writeObject(createGameRequest);
+        Object response = inputStream.readObject();
+
+        if (response instanceof CreateGameResponse createGameResponse) {
+            System.out.println("Game successfully created " + createGameResponse.getGameId());
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+    }
+
+    public static Object joinGame(ObjectOutputStream outputStream, ObjectInputStream inputStream, long userId) throws IOException, ClassNotFoundException {
+        System.out.println("Which game?");
+        BufferedReader valIn1 = new BufferedReader(new InputStreamReader(System.in));
+        long gameId = Long.parseLong(valIn1.readLine());
+        JoinGameRequest joinGameRequest = new JoinGameRequest(userId, gameId);
+        outputStream.writeObject(joinGameRequest);
+        Object response = inputStream.readObject();
+
+        if (response instanceof JoinGameResponse joinGameResponse) {
+            System.out.println("Game successfully has been joined " + joinGameResponse.getGameId());
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+        return response;
+    }
+
+    public static void getCardsFromDeck(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId) throws IOException, ClassNotFoundException {
+        CardsRequest cardsRequest = new CardsRequest(gameId);
+        outputStream.writeObject(cardsRequest);
+        Object response = inputStream.readObject();
+
+        if (response instanceof CardsResponse cardsResponse) {
+            System.out.println("Cards in a deck " + cardsResponse.getAmount() +
+                    ". Trump is " + cardsResponse.getTrump().getValue() +
+                    " " + cardsResponse.getTrump().getSuit());
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+    }
+
+    public static void takeCardsFromDeck(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, long userId, List<Card> hand) throws IOException, ClassNotFoundException {
+        TakeCardsFromListRequest request = new TakeCardsFromListRequest(gameId, userId, hand);
+        outputStream.writeObject(request);
+        Object response = inputStream.readObject();
+
+        if (response instanceof TakeCardsFromListResponse takeCardsFromListResponse) {
+            System.out.println("You got " + takeCardsFromListResponse.getCards());
         } else {
             System.out.println("Unexpected response type: " + response.getClass().getName());
         }

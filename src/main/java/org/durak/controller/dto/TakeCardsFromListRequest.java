@@ -2,9 +2,13 @@ package org.durak.controller.dto;
 
 import org.durak.model.Card;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
-public class TakeCardsFromListRequest {
+public class TakeCardsFromListRequest implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private long gameId;
     private long userId;
     private List<Card> hand;
