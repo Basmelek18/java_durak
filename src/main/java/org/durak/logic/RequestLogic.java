@@ -10,15 +10,13 @@ import java.net.Socket;
 
 public class RequestLogic {
 
-    public static Object login(Socket socket) throws IOException, ClassNotFoundException {
+    public static Object login(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Your login");
         BufferedReader valIn = new BufferedReader(new InputStreamReader(System.in));
         String value = valIn.readLine();
-        ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
         LoginRequest loginRequest = new LoginRequest(value);
         outputStream.writeObject(loginRequest);
 
-        ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
         Object response = inputStream.readObject();
 
         if (response instanceof LoginResponse loginResponse) {
@@ -29,7 +27,7 @@ public class RequestLogic {
         return response;
     }
 
-    public static void registration(Socket socket) throws IOException, ClassNotFoundException {
+    public static void registration(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Your login");
         BufferedReader valIn1 = new BufferedReader(new InputStreamReader(System.in));
         String value1 = valIn1.readLine();
@@ -37,10 +35,8 @@ public class RequestLogic {
         BufferedReader valIn2 = new BufferedReader(new InputStreamReader(System.in));
         String value2 = valIn2.readLine();
         RegistrationRequest registrationRequest = new RegistrationRequest(value1, value2);
-        ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
         outputStream.writeObject(registrationRequest);
 
-        ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
         Object response = inputStream.readObject();
 
         if (response instanceof RegistrationResponse) {

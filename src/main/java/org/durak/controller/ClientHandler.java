@@ -1,76 +1,72 @@
 package org.durak.controller;
 
-import org.durak.logic.GameLogic;
-import org.durak.logic.Player;
+import org.durak.controller.dto.*;
 import org.durak.model.Card;
-import org.durak.model.User;
 import org.durak.repository.GetCards;
-import org.durak.repository.SaveUser;
 
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ClientHandler extends Thread implements Runnable {
+public class ClientHandler implements Runnable {
     private Socket clientSocket;
-    private List<Card> cards = new ArrayList<>();
-    private PrintWriter out;
+    private LoginController loginController = new LoginController();
+    private RegistrationController registrationController = new RegistrationController();
+    private CreateGameController createGameController = new CreateGameController();
+    private JoinGameController joinGameController = new JoinGameController();
+    private CardsController cardsController = new CardsController();
+    private TakeCardsFromListController takeCardsFromListController = new TakeCardsFromListController();
+    private Map<Long, List<Long>> allGamesWithPlayers = new HashMap<>();
+    private Map<Long, List<Card>> cardsInDeckMap = new HashMap<>();
 
-    public ClientHandler(Socket clientSocket, List<Card> cards) {
+    public ClientHandler(Socket clientSocket, Map<Long, List<Long>> allGamesWithPlayers, Map<Long, List<Card>> cardsInDeckMap) {
         this.clientSocket = clientSocket;
-        this.cards = cards;
-        try {
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendMessage(String message) {
-        out.println(message);
+        this.allGamesWithPlayers = allGamesWithPlayers;
+        this.cardsInDeckMap = cardsInDeckMap;
     }
 
     @Override
     public void run() {
-        try (ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
-             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream())) {
-
-            String inputLine;
-            Object empty = inputStream.readObject();
-            outputStream.writeObject("Your login:");
-            Object login = inputStream.readObject();
-            User user;
-            if (!SaveUser.existingUser(login.toString())) {
-                outputStream.writeObject("Your name:");
-                Object name = inputStream.readObject();
-                user = new User(name.toString(), login.toString(), 0);
-                outputStream.writeObject(user);
-                SaveUser.createUser(user);
-            } else {
-                user = SaveUser.getUser(login.toString());
-            }
-            outputStream.writeObject("You are " + login);
-            outputStream.writeObject(user);
-
-            synchronized (cards) {
-                if (cards.isEmpty()) {
-                    outputStream.writeObject(null);  // No cards left to distribute
-                } else {
-                    int end = Math.min(6, cards.size());
-                    List<Card> clientCards = cards.subList(0, end);
-                    outputStream.writeObject(clientCards);
-                    cards.subList(0, end).clear();  // Remove the distributed cards
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+             ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream())) {
+            while (true) {
+                Object clientRequest = inputStream.readObject();
+                Object response = null;
+                if (clientRequest instanceof LoginRequest) {
+                    response = loginController.login((LoginRequest) clientRequest);
+                } else if (clientRequest instanceof RegistrationRequest) {
+                    response = registrationController.registration((RegistrationRequest) clientRequest);
+                } else if (clientRequest instanceof CreateGameController) {
+                    response = createGameController.startGame((CreateGameRequest) clientRequest);
+                    CreateGameResponse response1 = (CreateGameResponse) response;
+                    synchronized (allGamesWithPlayers){
+                        allGamesWithPlayers.put(response1.getGameId(), new ArrayList<>());
+                    }
+                    synchronized (cardsInDeckMap) {
+                        cardsInDeckMap.put(response1.getGameId(), GetCards.getCards());
+                    }
+                } else if (clientRequest instanceof JoinGameRequest) {
+                    response = joinGameController.joinGame((JoinGameRequest) clientRequest, allGamesWithPlayers);
+                } else if (clientRequest instanceof CardsController) {
+                    response = cardsController.getCards((CardsRequest) clientRequest, cardsInDeckMap);
+                } else if (clientRequest instanceof TakeCardsFromListRequest) {
+                    response = takeCardsFromListController.takeCardsFromList((TakeCardsFromListRequest) clientRequest, cardsInDeckMap);
                 }
+                outputStream.writeObject(response);
+                outputStream.flush();
             }
-
-        } catch (SQLException e) {
+        } catch (SQLException | IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
 

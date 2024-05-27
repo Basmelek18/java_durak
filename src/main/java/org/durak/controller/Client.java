@@ -1,31 +1,29 @@
 package org.durak.controller;
 
-import org.durak.controller.dto.LoginRequest;
-import org.durak.controller.dto.LoginResponse;
 import org.durak.logic.RequestLogic;
-import org.durak.model.Card;
-import org.durak.repository.SaveUser;
 
 import java.io.*;
 import java.net.*;
-import java.util.List;
 
 public class Client {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         final String serverAddress = "localhost"; // Адрес сервера
         final int serverPort = 8000; // Порт сервера
 
-        Socket socket = new Socket(serverAddress, serverPort);
         BufferedReader ctrlIn = new BufferedReader(new InputStreamReader(System.in));
         String userInput;
 
-        while ((userInput = ctrlIn.readLine()) != null) {
-
-            if (userInput.equals("l")) {
-                RequestLogic.login(socket);
-            } else if (userInput.equals("r")) {
-                RequestLogic.registration(socket);
+        try (Socket clientSocket = new Socket(serverAddress, serverPort);
+             ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
+             ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream())) {
+            while ((userInput = ctrlIn.readLine()) != null) {
+                if (userInput.equals("l")) {
+                    RequestLogic.login(clientSocket, outputStream, inputStream);
+                } else if (userInput.equals("r")) {
+                    RequestLogic.registration(clientSocket, outputStream, inputStream);
+                }
             }
+
         }
     }
 }
