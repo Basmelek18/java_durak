@@ -19,6 +19,7 @@ public class Server {
     private static List<Card> cards = new ArrayList<>();
     private Map<Long, List<Long>> allGamesWithPlayers = Collections.synchronizedMap(new HashMap<>());
     private Map<Long, List<Card>> cardsInDeckMap = Collections.synchronizedMap(new HashMap<>());
+    private Map<Long, Map<Card, Card>> table = Collections.synchronizedMap(new HashMap<>());
 
     public Server() throws SQLException {
         cards = GetCards.getCards();
@@ -31,7 +32,7 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept(); // Ожидание подключения клиента
                 System.out.println("Client connected: " + clientSocket);
-                new Thread(new ClientHandler(clientSocket, allGamesWithPlayers, cardsInDeckMap)).start();
+                new Thread(new ClientHandler(clientSocket, allGamesWithPlayers, cardsInDeckMap, table)).start();
             }
         } catch (IOException e) {
             System.err.println("Error in server: " + e.getMessage());

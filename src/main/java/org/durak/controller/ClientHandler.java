@@ -20,13 +20,18 @@ public class ClientHandler implements Runnable {
     private JoinGameController joinGameController = new JoinGameController();
     private CardsController cardsController = new CardsController();
     private TakeCardsFromListController takeCardsFromListController = new TakeCardsFromListController();
+    private CardsOnTableController cardsOnTableController = new CardsOnTableController();
+    private MoveController moveController = new MoveController();
+
     private Map<Long, List<Long>> allGamesWithPlayers;
     private Map<Long, List<Card>> cardsInDeckMap;
+    private Map<Long, Map<Card, Card>> tables;
 
-    public ClientHandler(Socket clientSocket, Map<Long, List<Long>> allGamesWithPlayers, Map<Long, List<Card>> cardsInDeckMap) {
+    public ClientHandler(Socket clientSocket, Map<Long, List<Long>> allGamesWithPlayers, Map<Long, List<Card>> cardsInDeckMap, Map<Long, Map<Card, Card>> tables) {
         this.clientSocket = clientSocket;
         this.allGamesWithPlayers = allGamesWithPlayers;
         this.cardsInDeckMap = cardsInDeckMap;
+        this.tables = tables;
     }
 
     @Override
@@ -49,13 +54,22 @@ public class ClientHandler implements Runnable {
                     synchronized (cardsInDeckMap) {
                         cardsInDeckMap.put(response1.getGameId(), GetCards.getCards());
                     }
+                    synchronized (tables) {
+                        tables.put(response1.getGameId(), new HashMap<>());
+                    }
                 } else if (clientRequest instanceof JoinGameRequest) {
                     response = joinGameController.joinGame((JoinGameRequest) clientRequest, allGamesWithPlayers);
                 } else if (clientRequest instanceof CardsRequest) {
                     response = cardsController.getCards((CardsRequest) clientRequest, cardsInDeckMap);
                 } else if (clientRequest instanceof TakeCardsFromListRequest) {
                     response = takeCardsFromListController.takeCardsFromList((TakeCardsFromListRequest) clientRequest, cardsInDeckMap);
+                } else if (clientRequest instanceof CardsOnTableRequest) {
+                    response = cardsOnTableController.getTable((CardsOnTableRequest) clientRequest, tables);
+                    System.out.println(((CardsOnTableResponse) response).getTable());
+                } else if (clientRequest instanceof MoveRequest) {
+                    response = moveController.move((MoveRequest) clientRequest, tables);
                 }
+
                 outputStream.writeObject(response);
                 outputStream.flush();
             }

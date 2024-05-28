@@ -87,7 +87,7 @@ public class RequestLogic {
         }
     }
 
-    public static void takeCardsFromDeck(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, long userId, List<Card> hand) throws IOException, ClassNotFoundException {
+    public static Object takeCardsFromDeck(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, long userId, List<Card> hand) throws IOException, ClassNotFoundException {
         TakeCardsFromListRequest request = new TakeCardsFromListRequest(gameId, userId, hand);
         outputStream.writeObject(request);
         Object response = inputStream.readObject();
@@ -97,6 +97,39 @@ public class RequestLogic {
         } else {
             System.out.println("Unexpected response type: " + response.getClass().getName());
         }
+        return response;
+    }
+
+    public static void getTable(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId) throws IOException, ClassNotFoundException {
+        CardsOnTableRequest request = new CardsOnTableRequest(gameId);
+        outputStream.writeObject(request);
+        Object response = inputStream.readObject();
+
+        if (response instanceof CardsOnTableResponse cardsOnTableResponse) {
+            System.out.println("You got " + cardsOnTableResponse.getTable());
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+
+    }
+
+    public static void move(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, List<Card> hand) throws IOException, ClassNotFoundException {
+        System.out.println("Which card?");
+        BufferedReader valIn1 = new BufferedReader(new InputStreamReader(System.in));
+        Card card = hand.get(Integer.parseInt(valIn1.readLine()) - 1);
+        hand.remove(card);
+
+        MoveRequest request = new MoveRequest(gameId, card);
+        outputStream.writeObject(request);
+        Object response = inputStream.readObject();
+        System.out.println(response);
+
+        if (response instanceof MoveResponse) {
+            System.out.println("You are moving with " + card);
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+
     }
 
 
