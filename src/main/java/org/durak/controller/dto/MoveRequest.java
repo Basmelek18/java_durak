@@ -9,11 +9,21 @@ public class MoveRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private long gameId;
+    private long userId;
     private Card card;
 
-    public MoveRequest(long gameId, Card card) {
+    public MoveRequest(long gameId, long userId, Card card) {
         this.gameId = gameId;
+        this.userId = userId;
         this.card = card;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public long getGameId() {

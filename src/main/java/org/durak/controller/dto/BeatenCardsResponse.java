@@ -4,13 +4,14 @@ import org.durak.model.Card;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 
-public class BeatCardResponse implements Serializable {
+public class BeatenCardsResponse implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private long gameId;
 
-    public BeatCardResponse(long gameId) {
+    public BeatenCardsResponse(long gameId) {
         this.gameId = gameId;
     }
 
@@ -21,4 +22,6 @@ public class BeatCardResponse implements Serializable {
     public void setGameId(long gameId) {
         this.gameId = gameId;
     }
+
+
 }

@@ -1,16 +1,14 @@
 package org.durak.controller.dto;
 
-import org.durak.model.Card;
-
 import java.io.Serial;
 import java.io.Serializable;
 
-public class BeatCardResponse implements Serializable {
+public class BeatenCardsRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private long gameId;
 
-    public BeatCardResponse(long gameId) {
+    public BeatenCardsRequest(long gameId) {
         this.gameId = gameId;
     }
 

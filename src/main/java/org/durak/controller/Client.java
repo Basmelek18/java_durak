@@ -3,6 +3,7 @@ package org.durak.controller;
 import org.durak.controller.dto.JoinGameResponse;
 import org.durak.controller.dto.LoginResponse;
 import org.durak.controller.dto.TakeCardsFromListResponse;
+import org.durak.controller.dto.TakeCardsFromTableResponse;
 import org.durak.logic.RequestLogic;
 import org.durak.model.Card;
 
@@ -44,9 +45,16 @@ public class Client {
                 } else if (userInput.equals("t")) {
                     RequestLogic.getTable(outputStream, inputStream, gameId);
                 } else if (userInput.equals("m")) {
-                    RequestLogic.move(outputStream, inputStream, gameId, hand);
+                    RequestLogic.move(outputStream, inputStream, gameId, userId, hand);
                 } else if (userInput.equals("h")) {
                     System.out.println(hand);
+                } else if (userInput.equals("bc")) {
+                    RequestLogic.beat(outputStream, inputStream, gameId, userId, hand);
+                } else if (userInput.equals("b")) {
+                    RequestLogic.beaten(outputStream, inputStream, gameId);
+                } else if (userInput.equals("tt")) {
+                    Object response = RequestLogic.takeFromTable(outputStream, inputStream, gameId);
+                    hand.addAll(((TakeCardsFromTableResponse) response).getCards());
                 }
             }
 

@@ -7,10 +7,7 @@ import org.durak.repository.GetCards;
 import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClientHandler implements Runnable {
     private Socket clientSocket;
@@ -22,6 +19,9 @@ public class ClientHandler implements Runnable {
     private TakeCardsFromListController takeCardsFromListController = new TakeCardsFromListController();
     private CardsOnTableController cardsOnTableController = new CardsOnTableController();
     private MoveController moveController = new MoveController();
+    private BeatCardController beatCardController = new BeatCardController();
+    private BeatenCardsController beatenCardsController = new BeatenCardsController();
+    private TakeCardsFromTableController takeCardsFromTableController = new TakeCardsFromTableController();
 
     private Map<Long, List<Long>> allGamesWithPlayers;
     private Map<Long, List<Card>> cardsInDeckMap;
@@ -55,7 +55,7 @@ public class ClientHandler implements Runnable {
                         cardsInDeckMap.put(response1.getGameId(), GetCards.getCards());
                     }
                     synchronized (tables) {
-                        tables.put(response1.getGameId(), new HashMap<>());
+                        tables.put(response1.getGameId(), new LinkedHashMap<>());
                     }
                 } else if (clientRequest instanceof JoinGameRequest) {
                     response = joinGameController.joinGame((JoinGameRequest) clientRequest, allGamesWithPlayers);
@@ -68,7 +68,14 @@ public class ClientHandler implements Runnable {
                     System.out.println(((CardsOnTableResponse) response).getTable());
                 } else if (clientRequest instanceof MoveRequest) {
                     response = moveController.move((MoveRequest) clientRequest, tables);
+                } else if (clientRequest instanceof BeatCardRequest) {
+                    response = beatCardController.beat((BeatCardRequest) clientRequest, tables);
+                } else if (clientRequest instanceof BeatenCardsRequest) {
+                    response = beatenCardsController.beatenCards((BeatenCardsRequest) clientRequest, tables);
+                } else if (clientRequest instanceof TakeCardsFromTableRequest) {
+                    response = takeCardsFromTableController.takeCardsFromTable((TakeCardsFromTableRequest) clientRequest, tables);
                 }
+
                 outputStream.reset();
                 outputStream.writeObject(response);
                 outputStream.flush();

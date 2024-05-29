@@ -121,13 +121,13 @@ public class RequestLogic {
 
     }
 
-    public static void move(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, List<Card> hand) throws IOException, ClassNotFoundException {
+    public static void move(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, long userId, List<Card> hand) throws IOException, ClassNotFoundException {
         System.out.println("Which card?");
         BufferedReader valIn1 = new BufferedReader(new InputStreamReader(System.in));
         Card card = hand.get(Integer.parseInt(valIn1.readLine()) - 1);
         hand.remove(card);
 
-        MoveRequest request = new MoveRequest(gameId, card);
+        MoveRequest request = new MoveRequest(gameId, userId, card);
         outputStream.reset();
         outputStream.writeObject(request);
         Object response = inputStream.readObject();
@@ -141,5 +141,50 @@ public class RequestLogic {
 
     }
 
+    public static void beat(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, long userId, List<Card> hand) throws IOException, ClassNotFoundException {
+        System.out.println("Which card?");
+        BufferedReader valIn1 = new BufferedReader(new InputStreamReader(System.in));
+        Card card = hand.get(Integer.parseInt(valIn1.readLine()) - 1);
+        hand.remove(card);
+
+        BeatCardRequest request = new BeatCardRequest(gameId, userId, card);
+        outputStream.reset();
+        outputStream.writeObject(request);
+        Object response = inputStream.readObject();
+
+        if (response instanceof BeatCardResponse) {
+            System.out.println("You are moving with " + card);
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+
+    }
+    public static void beaten(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId) throws IOException, ClassNotFoundException {
+        BeatenCardsRequest request = new BeatenCardsRequest(gameId);
+        outputStream.reset();
+        outputStream.writeObject(request);
+        Object response = inputStream.readObject();
+
+        if (response instanceof BeatenCardsResponse) {
+            System.out.println("Table is clear");
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+    }
+
+    public static Object takeFromTable(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId) throws IOException, ClassNotFoundException {
+        TakeCardsFromTableRequest request = new TakeCardsFromTableRequest(gameId);
+        outputStream.reset();
+        outputStream.writeObject(request);
+        Object response = inputStream.readObject();
+
+        if (response instanceof TakeCardsFromTableResponse) {
+            System.out.println("Cards added in hand");
+            return response;
+        } else {
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+        }
+        return null;
+    }
 
 }
