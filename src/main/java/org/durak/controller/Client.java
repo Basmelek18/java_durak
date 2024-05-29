@@ -26,33 +26,38 @@ public class Client {
         try (Socket clientSocket = new Socket(serverAddress, serverPort);
              ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
              ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream())) {
+            boolean loginFlag = false;
+            boolean joinFlag = false;
             while ((userInput = ctrlIn.readLine()) != null) {
                 if (userInput.equals("l")) {
                     Object response = RequestLogic.login(outputStream, inputStream);
                     userId = ((LoginResponse) response).getUserId();
+                    loginFlag = true;
                 } else if (userInput.equals("r")) {
                     RequestLogic.registration(outputStream, inputStream);
-                } else if (userInput.equals("cg")) {
+                } else if (userInput.equals("cg") && loginFlag) {
                     RequestLogic.createGame(outputStream, inputStream, userId);
-                } else if (userInput.equals("j")) {
+                } else if (userInput.equals("j")  && loginFlag) {
                     Object response = RequestLogic.joinGame(outputStream, inputStream, userId);
                     gameId = ((JoinGameResponse) response).getGameId();
-                } else if (userInput.equals("gc")) {
+                    joinFlag = true;
+                } else if (userInput.equals("gc") && loginFlag && joinFlag) {
                     RequestLogic.getCardsFromDeck(outputStream, inputStream, gameId);
-                } else if (userInput.equals("tc")) {
+                } else if (userInput.equals("tc") && loginFlag && joinFlag) {
                     Object response = RequestLogic.takeCardsFromDeck(outputStream, inputStream, gameId, userId, hand);
+                    hand.clear();
                     hand.addAll(((TakeCardsFromListResponse) response).getCards());
-                } else if (userInput.equals("t")) {
+                } else if (userInput.equals("t") && loginFlag && joinFlag) {
                     RequestLogic.getTable(outputStream, inputStream, gameId);
-                } else if (userInput.equals("m")) {
+                } else if (userInput.equals("m") && loginFlag && joinFlag) {
                     RequestLogic.move(outputStream, inputStream, gameId, userId, hand);
-                } else if (userInput.equals("h")) {
+                } else if (userInput.equals("h") && loginFlag && joinFlag) {
                     System.out.println(hand);
-                } else if (userInput.equals("bc")) {
+                } else if (userInput.equals("bc") && loginFlag && joinFlag) {
                     RequestLogic.beat(outputStream, inputStream, gameId, userId, hand);
-                } else if (userInput.equals("b")) {
+                } else if (userInput.equals("b") && loginFlag && joinFlag) {
                     RequestLogic.beaten(outputStream, inputStream, gameId);
-                } else if (userInput.equals("tt")) {
+                } else if (userInput.equals("tt") && loginFlag && joinFlag) {
                     Object response = RequestLogic.takeFromTable(outputStream, inputStream, gameId);
                     hand.addAll(((TakeCardsFromTableResponse) response).getCards());
                 }
@@ -61,44 +66,3 @@ public class Client {
         }
     }
 }
-
-
-
-
-
-//            String userInput;
-//            String myLogin = "";
-//            String serverAnswer;
-//
-//            while ((userInput = stdIn.readLine()) != null) {
-//                if (!myLogin.equals("")) {
-//                    out.writeObject(myLogin + ":" + userInput); // Отправка данных на сервер
-//                } else {
-//                    out.writeObject(userInput); // Отправка данных на сервер
-//                }
-//                serverAnswer = in.readObject().toString();
-//                System.out.println("От сервера: " + serverAnswer); // Вывод ответа от сервера
-//                if (serverAnswer.startsWith("You are ")) {
-//                    myLogin = serverAnswer;
-//                    int lastIndex = myLogin.lastIndexOf(" "); // Находим индекс последнего пробела
-//                    myLogin = myLogin.substring(lastIndex + 1);
-//                    System.out.println("My login " + myLogin);
-//                }
-//            }
-//            List<Card> cards = (List<Card>) in.readObject();
-//            if (cards != null) {
-//                System.out.println("Received cards:");
-//                for (Card card : cards) {
-//                    System.out.println(card);
-//                }
-//            } else {
-//                System.out.println("No more cards available.");
-//            }
-//        } catch (UnknownHostException e) {
-//            System.err.println("Не удалось определить хост: " + serverAddress);
-//        } catch (IOException e) {
-//            System.err.println("Ошибка ввода/вывода для соединения с " + serverAddress);
-//        } catch (ClassNotFoundException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }

@@ -84,9 +84,13 @@ public class RequestLogic {
         Object response = inputStream.readObject();
 
         if (response instanceof CardsResponse cardsResponse) {
-            System.out.println("Cards in a deck " + cardsResponse.getAmount() +
-                    ". Trump is " + cardsResponse.getTrump().getValue() +
-                    " " + cardsResponse.getTrump().getSuit());
+            if (cardsResponse.getTrump() == null) {
+                System.out.println("Cards deck is empty");
+            } else {
+                System.out.println("Cards in a deck " + cardsResponse.getAmount() +
+                        ". Trump is " + cardsResponse.getTrump().getValue() +
+                        " " + cardsResponse.getTrump().getSuit());
+            }
         } else {
             System.out.println("Unexpected response type: " + response.getClass().getName());
         }

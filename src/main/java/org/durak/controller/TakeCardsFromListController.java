@@ -13,11 +13,18 @@ public class TakeCardsFromListController {
         System.out.println(handSize);
         if (handSize<6) {
             List<Card> valuesCards = cards.get(request.getGameId());
-            for (int i = 0; i < 6 - handSize; i++) {
-                request.getHand().add(valuesCards.get(i));
-            }
-            for (int i = 0; i < 6 - handSize; i++) {
-                valuesCards.remove(0);
+            if (valuesCards.size() >= 6 - handSize) {
+                for (int i = 0; i < 6 - handSize; i++) {
+                    request.getHand().add(valuesCards.get(i));
+                }
+                valuesCards.subList(0, 6 - handSize).clear();
+            } else {
+                for (Card valuesCard : valuesCards) {
+                    request.getHand().add(valuesCard);
+                }
+                if (valuesCards.size() > 0) {
+                    valuesCards.subList(0, valuesCards.size()).clear();
+                }
             }
             return new TakeCardsFromListResponse(request.getGameId(), request.getUserId(), request.getHand());
         }
