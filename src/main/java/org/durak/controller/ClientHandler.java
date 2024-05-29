@@ -39,7 +39,7 @@ public class ClientHandler implements Runnable {
         try (ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
              ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream())) {
             while (true) {
-                Object clientRequest = inputStream.readObject();
+                Object clientRequest = inputStream.readUnshared();
                 Object response = null;
                 if (clientRequest instanceof LoginRequest) {
                     response = loginController.login((LoginRequest) clientRequest);
@@ -69,7 +69,7 @@ public class ClientHandler implements Runnable {
                 } else if (clientRequest instanceof MoveRequest) {
                     response = moveController.move((MoveRequest) clientRequest, tables);
                 }
-
+                outputStream.reset();
                 outputStream.writeObject(response);
                 outputStream.flush();
             }

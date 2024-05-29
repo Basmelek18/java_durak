@@ -10,6 +10,7 @@ import java.util.Map;
 public class TakeCardsFromListController {
     public TakeCardsFromListResponse takeCardsFromList(TakeCardsFromListRequest request, Map<Long, List<Card>> cards) {
         int handSize = request.getHand().size();
+        System.out.println(handSize);
         if (handSize<6) {
             List<Card> valuesCards = cards.get(request.getGameId());
             for (int i = 0; i < 6 - handSize; i++) {

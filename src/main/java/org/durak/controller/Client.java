@@ -45,6 +45,8 @@ public class Client {
                     RequestLogic.getTable(outputStream, inputStream, gameId);
                 } else if (userInput.equals("m")) {
                     RequestLogic.move(outputStream, inputStream, gameId, hand);
+                } else if (userInput.equals("h")) {
+                    System.out.println(hand);
                 }
             }
 

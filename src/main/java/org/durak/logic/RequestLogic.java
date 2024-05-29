@@ -14,6 +14,7 @@ public class RequestLogic {
         BufferedReader valIn = new BufferedReader(new InputStreamReader(System.in));
         String value = valIn.readLine();
         LoginRequest loginRequest = new LoginRequest(value);
+        outputStream.reset();
         outputStream.writeObject(loginRequest);
 
         Object response = inputStream.readObject();
@@ -34,6 +35,7 @@ public class RequestLogic {
         BufferedReader valIn2 = new BufferedReader(new InputStreamReader(System.in));
         String value2 = valIn2.readLine();
         RegistrationRequest registrationRequest = new RegistrationRequest(value1, value2);
+        outputStream.reset();
         outputStream.writeObject(registrationRequest);
 
         Object response = inputStream.readObject();
@@ -47,6 +49,7 @@ public class RequestLogic {
 
     public static void createGame(ObjectOutputStream outputStream, ObjectInputStream inputStream, long userId) throws IOException, ClassNotFoundException {
         CreateGameRequest createGameRequest = new CreateGameRequest(userId);
+        outputStream.reset();
         outputStream.writeObject(createGameRequest);
         Object response = inputStream.readObject();
 
@@ -62,6 +65,7 @@ public class RequestLogic {
         BufferedReader valIn1 = new BufferedReader(new InputStreamReader(System.in));
         long gameId = Long.parseLong(valIn1.readLine());
         JoinGameRequest joinGameRequest = new JoinGameRequest(userId, gameId);
+        outputStream.reset();
         outputStream.writeObject(joinGameRequest);
         Object response = inputStream.readObject();
 
@@ -75,6 +79,7 @@ public class RequestLogic {
 
     public static void getCardsFromDeck(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId) throws IOException, ClassNotFoundException {
         CardsRequest cardsRequest = new CardsRequest(gameId);
+        outputStream.reset();
         outputStream.writeObject(cardsRequest);
         Object response = inputStream.readObject();
 
@@ -89,6 +94,8 @@ public class RequestLogic {
 
     public static Object takeCardsFromDeck(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId, long userId, List<Card> hand) throws IOException, ClassNotFoundException {
         TakeCardsFromListRequest request = new TakeCardsFromListRequest(gameId, userId, hand);
+        System.out.println(hand);
+        outputStream.reset();
         outputStream.writeObject(request);
         Object response = inputStream.readObject();
 
@@ -102,6 +109,7 @@ public class RequestLogic {
 
     public static void getTable(ObjectOutputStream outputStream, ObjectInputStream inputStream, long gameId) throws IOException, ClassNotFoundException {
         CardsOnTableRequest request = new CardsOnTableRequest(gameId);
+        outputStream.reset();
         outputStream.writeObject(request);
         Object response = inputStream.readObject();
 
@@ -120,6 +128,7 @@ public class RequestLogic {
         hand.remove(card);
 
         MoveRequest request = new MoveRequest(gameId, card);
+        outputStream.reset();
         outputStream.writeObject(request);
         Object response = inputStream.readObject();
         System.out.println(response);

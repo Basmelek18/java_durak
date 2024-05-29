@@ -2,6 +2,7 @@ package org.durak.model;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Card implements Serializable {
     @Serial
@@ -21,5 +22,18 @@ public class Card implements Serializable {
 
     public int getSuit() {
         return suit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return rank == card.rank && suit == card.suit;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rank, suit);
     }
 }
