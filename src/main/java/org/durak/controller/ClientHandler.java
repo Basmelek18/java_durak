@@ -22,16 +22,26 @@ public class ClientHandler implements Runnable {
     private BeatCardController beatCardController = new BeatCardController();
     private BeatenCardsController beatenCardsController = new BeatenCardsController();
     private TakeCardsFromTableController takeCardsFromTableController = new TakeCardsFromTableController();
+    private FirstMoveController firstMoveController = new FirstMoveController();
+    private CheckFirstController checkFirstController = new CheckFirstController();
 
     private Map<Long, List<Long>> allGamesWithPlayers;
     private Map<Long, List<Card>> cardsInDeckMap;
     private Map<Long, Map<Card, Card>> tables;
+    private Map<Long, List<Card>> firstMoveHands;
 
-    public ClientHandler(Socket clientSocket, Map<Long, List<Long>> allGamesWithPlayers, Map<Long, List<Card>> cardsInDeckMap, Map<Long, Map<Card, Card>> tables) {
+    public ClientHandler(
+            Socket clientSocket,
+            Map<Long, List<Long>> allGamesWithPlayers,
+            Map<Long, List<Card>> cardsInDeckMap,
+            Map<Long, Map<Card, Card>> tables,
+            Map<Long, List<Card>> firstMoveHands
+    ) {
         this.clientSocket = clientSocket;
         this.allGamesWithPlayers = allGamesWithPlayers;
         this.cardsInDeckMap = cardsInDeckMap;
         this.tables = tables;
+        this.firstMoveHands = firstMoveHands;
     }
 
     @Override
@@ -59,6 +69,9 @@ public class ClientHandler implements Runnable {
                     }
                 } else if (clientRequest instanceof JoinGameRequest) {
                     response = joinGameController.joinGame((JoinGameRequest) clientRequest, allGamesWithPlayers);
+                    synchronized (firstMoveHands) {
+                        firstMoveHands.put(((JoinGameRequest) clientRequest).getUserId(), new ArrayList<>());
+                    }
                 } else if (clientRequest instanceof CardsRequest) {
                     response = cardsController.getCards((CardsRequest) clientRequest, cardsInDeckMap);
                 } else if (clientRequest instanceof TakeCardsFromListRequest) {
@@ -74,6 +87,10 @@ public class ClientHandler implements Runnable {
                     response = beatenCardsController.beatenCards((BeatenCardsRequest) clientRequest, tables);
                 } else if (clientRequest instanceof TakeCardsFromTableRequest) {
                     response = takeCardsFromTableController.takeCardsFromTable((TakeCardsFromTableRequest) clientRequest, tables);
+                } else if (clientRequest instanceof FirstMoveRequest) {
+                    response = firstMoveController.firstMove((FirstMoveRequest) clientRequest, firstMoveHands);
+                } else if (clientRequest instanceof CheckFirstRequest) {
+                    response = checkFirstController.checkFirst((CheckFirstRequest) clientRequest, firstMoveHands, cardsInDeckMap);
                 }
 
                 outputStream.reset();

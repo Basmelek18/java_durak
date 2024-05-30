@@ -17,9 +17,8 @@ public class TakeCardsFromTableController {
                 cards.add(entry.getKey());
             }
             if (entry.getValue() != null) {
-                cards.add(entry.getKey());
+                cards.add(entry.getValue());
             }
-            cards.add(entry.getValue());
         }
         table.put(request.getGameId(), new LinkedHashMap<>());
         return new TakeCardsFromTableResponse(request.getGameId(), cards);

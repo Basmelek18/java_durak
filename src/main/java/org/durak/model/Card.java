@@ -9,6 +9,12 @@ public class Card implements Serializable {
     private static final long serialVersionUID = 1L;
     private final int rank;
     private final int suit;
+    public enum Suit {
+        HEARTS,
+        DIAMONDS,
+        CLUBS,
+        SPADES
+    }
 
 
     public Card(int rank, int suit) {
@@ -22,6 +28,12 @@ public class Card implements Serializable {
 
     public int getSuit() {
         return suit;
+    }
+
+    @Override
+    public String toString() {
+        Suit[] suitE = Suit.values();
+        return rank + " " + suitE[suit];
     }
 
     @Override

@@ -19,6 +19,7 @@ public class Client {
         long userId = 0;
         long gameId = 0;
         List<Card> hand = new ArrayList<>();
+        List<Card> table = new ArrayList<>();
 
         BufferedReader ctrlIn = new BufferedReader(new InputStreamReader(System.in));
         String userInput;
@@ -48,18 +49,21 @@ public class Client {
                     hand.clear();
                     hand.addAll(((TakeCardsFromListResponse) response).getCards());
                 } else if (userInput.equals("t") && loginFlag && joinFlag) {
-                    RequestLogic.getTable(outputStream, inputStream, gameId);
+                    table = RequestLogic.getTable(outputStream, inputStream, gameId);
                 } else if (userInput.equals("m") && loginFlag && joinFlag) {
-                    RequestLogic.move(outputStream, inputStream, gameId, userId, hand);
+                    RequestLogic.move(outputStream, inputStream, gameId, userId, hand, table);
+                    table = RequestLogic.getTable(outputStream, inputStream, gameId);
                 } else if (userInput.equals("h") && loginFlag && joinFlag) {
-                    System.out.println(hand);
+                    System.out.println(RequestLogic.cardsToStr(hand));
                 } else if (userInput.equals("bc") && loginFlag && joinFlag) {
                     RequestLogic.beat(outputStream, inputStream, gameId, userId, hand);
                 } else if (userInput.equals("b") && loginFlag && joinFlag) {
                     RequestLogic.beaten(outputStream, inputStream, gameId);
                 } else if (userInput.equals("tt") && loginFlag && joinFlag) {
                     Object response = RequestLogic.takeFromTable(outputStream, inputStream, gameId);
+                    assert response != null;
                     hand.addAll(((TakeCardsFromTableResponse) response).getCards());
+                    System.out.println(hand);
                 }
             }
 
