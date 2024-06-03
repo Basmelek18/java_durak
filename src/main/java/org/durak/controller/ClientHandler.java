@@ -24,24 +24,29 @@ public class ClientHandler implements Runnable {
     private TakeCardsFromTableController takeCardsFromTableController = new TakeCardsFromTableController();
     private FirstMoveController firstMoveController = new FirstMoveController();
     private CheckFirstController checkFirstController = new CheckFirstController();
+    private CheckMoveController checkMoveController = new CheckMoveController();
+    private ChangeMoveController changeMoveController = new ChangeMoveController();
 
     private Map<Long, List<Long>> allGamesWithPlayers;
     private Map<Long, List<Card>> cardsInDeckMap;
     private Map<Long, Map<Card, Card>> tables;
     private Map<Long, List<Card>> firstMoveHands;
+    private Map<Long, Boolean> moves;
 
     public ClientHandler(
             Socket clientSocket,
             Map<Long, List<Long>> allGamesWithPlayers,
             Map<Long, List<Card>> cardsInDeckMap,
             Map<Long, Map<Card, Card>> tables,
-            Map<Long, List<Card>> firstMoveHands
+            Map<Long, List<Card>> firstMoveHands,
+            Map<Long, Boolean> moves
     ) {
         this.clientSocket = clientSocket;
         this.allGamesWithPlayers = allGamesWithPlayers;
         this.cardsInDeckMap = cardsInDeckMap;
         this.tables = tables;
         this.firstMoveHands = firstMoveHands;
+        this.moves = moves;
     }
 
     @Override
@@ -91,6 +96,15 @@ public class ClientHandler implements Runnable {
                     response = firstMoveController.firstMove((FirstMoveRequest) clientRequest, firstMoveHands);
                 } else if (clientRequest instanceof CheckFirstRequest) {
                     response = checkFirstController.checkFirst((CheckFirstRequest) clientRequest, firstMoveHands, cardsInDeckMap);
+                    synchronized (moves) {
+                        moves.put(
+                                ((CheckFirstRequest) clientRequest).getUserId(),
+                                ((CheckFirstRequest) clientRequest).getUserId() == ((CheckFirstResponse) response).getUserId());
+                    }
+                } else if (clientRequest instanceof CheckMoveRequest) {
+                    response = checkMoveController.approved((CheckMoveRequest) clientRequest, moves);
+                } else if (clientRequest instanceof ChangeMoveRequest) {
+                    response = changeMoveController.changeMove((ChangeMoveRequest) clientRequest, moves);
                 }
 
                 outputStream.reset();
