@@ -16,7 +16,7 @@ import java.util.Objects;
 public class SecondClient {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         final String serverAddress = "localhost"; // Адрес сервера
-        final int serverPort = 8000; // Порт сервера
+        final int serverPort = 10000; // Порт сервера
         long userId = 0;
         long gameId = 0;
         List<Card> hand = new ArrayList<>();
